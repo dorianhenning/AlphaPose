@@ -10,6 +10,8 @@ PoseFlow/val-predict
 train_sppe/coco-minival500_images.txt
 train_sppe/person_keypoints_val2014.json
 
+.DS_Store*
+.idea/
 ssd/examples
 images
 

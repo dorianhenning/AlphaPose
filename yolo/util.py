@@ -21,10 +21,10 @@ def count_learnable_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 def convert2cpu(matrix):
-    if matrix.is_cuda:
-        return torch.FloatTensor(matrix.size()).copy_(matrix)
-    else:
-        return matrix
+#     if matrix.is_cuda:
+#         return torch.FloatTensor(matrix.size()).copy_(matrix)
+#     else:
+    return matrix
 
 def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA = True):
     batch_size = prediction.size(0)
@@ -56,19 +56,12 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA = True):
     x_offset = torch.FloatTensor(a).view(-1,1)
     y_offset = torch.FloatTensor(b).view(-1,1)
     
-    if CUDA:
-        x_offset = x_offset.cuda()
-        y_offset = y_offset.cuda()
-    
     x_y_offset = torch.cat((x_offset, y_offset), 1).repeat(1,num_anchors).view(-1,2).unsqueeze(0)
     
     prediction[:,:,:2] += x_y_offset
       
     #log space transform height and the width
     anchors = torch.FloatTensor(anchors)
-    
-    if CUDA:
-        anchors = anchors.cuda()
     
     anchors = anchors.repeat(grid_size*grid_size, 1).unsqueeze(0)
     prediction[:,:,2:4] = torch.exp(prediction[:,:,2:4])*anchors
@@ -250,19 +243,12 @@ def predict_transform_half(prediction, inp_dim, anchors, num_classes, CUDA = Tru
     x_offset = torch.FloatTensor(a).view(-1,1)
     y_offset = torch.FloatTensor(b).view(-1,1)
     
-    if CUDA:
-        x_offset = x_offset.cuda().half()
-        y_offset = y_offset.cuda().half()
-    
     x_y_offset = torch.cat((x_offset, y_offset), 1).repeat(1,num_anchors).view(-1,2).unsqueeze(0)
     
     prediction[:,:,:2] += x_y_offset
       
     #log space transform height and the width
     anchors = torch.HalfTensor(anchors)
-    
-    if CUDA:
-        anchors = anchors.cuda()
     
     anchors = anchors.repeat(grid_size*grid_size, 1).unsqueeze(0)
     prediction[:,:,2:4] = torch.exp(prediction[:,:,2:4])*anchors

@@ -96,7 +96,7 @@ parser.add_argument('--port', dest='port',
 
 opt = parser.parse_args()
 if opt.Continue:
-    opt = torch.load("../exp/{}/{}/option.pkl".format(opt.dataset, opt.expID))
+    opt = torch.load("../exp/{}/{}/option.pkl".format(opt.dataset, opt.expID), map_location='cpu')
     opt.Continue = True
     opt.nEpochs = 50
     print("--- Continue ---")

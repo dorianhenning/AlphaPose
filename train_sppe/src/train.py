@@ -25,9 +25,7 @@ def train(train_loader, m, criterion, optimizer, writer):
     train_loader_desc = tqdm(train_loader)
 
     for i, (inps, labels, setMask, imgset) in enumerate(train_loader_desc):
-        inps = inps.cuda().requires_grad_()
-        labels = labels.cuda()
-        setMask = setMask.cuda()
+        inps = inps.requires_grad_()
         out = m(inps)
 
         loss = criterion(out.mul(setMask), labels)
@@ -68,9 +66,6 @@ def valid(val_loader, m, criterion, optimizer, writer):
     val_loader_desc = tqdm(val_loader)
 
     for i, (inps, labels, setMask, imgset) in enumerate(val_loader_desc):
-        inps = inps.cuda()
-        labels = labels.cuda()
-        setMask = setMask.cuda()
 
         with torch.no_grad():
             out = m(inps)
@@ -109,10 +104,10 @@ def valid(val_loader, m, criterion, optimizer, writer):
 def main():
 
     # Model Initialize
-    m = createModel().cuda()
+    m = createModel()
     if opt.loadModel:
         print('Loading Model from {}'.format(opt.loadModel))
-        m.load_state_dict(torch.load(opt.loadModel))
+        m.load_state_dict(torch.load(opt.loadModel, map_location='cpu'))
         if not os.path.exists("../exp/{}/{}".format(opt.dataset, opt.expID)):
             try:
                 os.mkdir("../exp/{}/{}".format(opt.dataset, opt.expID))
@@ -128,7 +123,7 @@ def main():
                 os.mkdir("../exp/{}".format(opt.dataset))
                 os.mkdir("../exp/{}/{}".format(opt.dataset, opt.expID))
 
-    criterion = torch.nn.MSELoss().cuda()
+    criterion = torch.nn.MSELoss()
 
     if opt.optMethod == 'rmsprop':
         optimizer = torch.optim.RMSprop(m.parameters(),
@@ -158,7 +153,7 @@ def main():
         val_dataset, batch_size=opt.validBatch, shuffle=False, num_workers=opt.nThreads, pin_memory=True)
 
     # Model Transfer
-    m = torch.nn.DataParallel(m).cuda()
+    m = torch.nn.DataParallel(m)
 
     # Start Training
     for i in range(opt.nEpochs):

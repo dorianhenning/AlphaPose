@@ -25,7 +25,7 @@ if __name__ == '__main__':
     confidence = 0.5
     nms_thesh = 0.4
 
-    CUDA = torch.cuda.is_available()
+    CUDA = False
 
     num_classes = 80
     classes = load_classes('data/coco.names') 
@@ -40,10 +40,6 @@ if __name__ == '__main__':
     inp_dim = int(model.net_info["height"])
     assert inp_dim % 32 == 0
     assert inp_dim > 32
-
-    #If there's a GPU availible, put the model on GPU
-    if CUDA:
-        model.cuda()
 
     #Set the model in evaluation mode
     model.eval()
@@ -62,22 +58,16 @@ if __name__ == '__main__':
     im_dim_list = [x[2] for x in batches]
     im_dim_list = torch.FloatTensor(im_dim_list).repeat(1, 2)
 
-    if CUDA:
-        im_dim_list = im_dim_list.cuda()
-
-
     for batch in im_batches:
         #load the image
-        if CUDA:
-            batch = batch.cuda()
         with torch.no_grad():
             prediction = model(Variable(batch), CUDA)
 
         prediction = write_results(prediction, confidence, num_classes, nms=True, nms_conf=nms_thesh)
         output = prediction
 
-        if CUDA:
-            torch.cuda.synchronize()
+        # if CUDA:
+        #     torch.cuda.synchronize()
 
     try:
         output

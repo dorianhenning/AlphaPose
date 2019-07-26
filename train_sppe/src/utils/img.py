@@ -207,8 +207,6 @@ def flip(x):
                 x[i] = np.transpose(
                     np.fliplr(np.transpose(x[i], (0, 2, 1))), (0, 2, 1))
         x = torch.from_numpy(x.copy())
-        if is_cuda:
-            x = x.cuda()
     return x
 
 

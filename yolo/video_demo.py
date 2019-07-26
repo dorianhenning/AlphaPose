@@ -22,9 +22,6 @@ def get_test_input(input_dim, CUDA):
     img_ = torch.from_numpy(img_).float()
     img_ = Variable(img_)
     
-    if CUDA:
-        img_ = img_.cuda()
-    
     return img_
 
 def prep_image(img, inp_dim):
@@ -87,11 +84,11 @@ if __name__ == '__main__':
     nms_thesh = float(args.nms_thresh)
     start = 0
 
-    CUDA = torch.cuda.is_available()
+    CUDA = False
 
     num_classes = 80
 
-    CUDA = torch.cuda.is_available()
+    CUDA = False
     
     bbox_attrs = 5 + num_classes
     
@@ -105,9 +102,6 @@ if __name__ == '__main__':
     assert inp_dim % 32 == 0 
     assert inp_dim > 32
 
-    if CUDA:
-        model.cuda()
-        
     model(get_test_input(inp_dim, CUDA), CUDA)
 
     model.eval()
@@ -130,14 +124,9 @@ if __name__ == '__main__':
             
             im_dim = torch.FloatTensor(dim).repeat(1,2)                        
             
-            
-            if CUDA:
-                im_dim = im_dim.cuda()
-                img = img.cuda()
-            
-            with torch.no_grad():   
+            with torch.no_grad():
                 output = model(Variable(img), CUDA)
-            output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
+            output = write_results(output, confidence, num_classes, nms=True, nms_conf = nms_thesh)
 
             if type(output) == int:
                 frames += 1

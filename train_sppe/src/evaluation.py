@@ -40,7 +40,6 @@ g = torch.from_numpy(gaussian(4 * 1 + 1)).clone()
 g = torch.unsqueeze(g, 1)
 g = g.repeat(17, 1, 1, 1)
 gaussian_kernel.weight.data = g.float()
-gaussian_kernel.cuda()
 
 
 def prediction(model):
@@ -54,7 +53,7 @@ def prediction(model):
 
     tmp_inp = {}
     for i, (inp, box, im_name, metaData) in enumerate(minival_loader_desc):
-        #inp = torch.autograd.Variable(inp.cuda(), volatile=True)
+        #inp = torch.autograd.Variable(inp, volatile=True)
         pt1, pt2, ori_inp = metaData
         #with torch.autograd.profiler.profile(use_cuda=True) as prof:
         if im_name[0] in tmp_inp.keys():

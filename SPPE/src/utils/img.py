@@ -316,10 +316,10 @@ def flip(x):
     if '0.4.1' in torch.__version__ or '1.0' in torch.__version__:
         return x.flip(dims=(dim,))
     else:
-        is_cuda = False
-        if x.is_cuda:
-            is_cuda = True
-            x = x.cpu()
+        # is_cuda = False
+        # if x.is_cuda:
+        #     is_cuda = True
+        #     x = x.cpu()
         x = x.numpy().copy()
         if x.ndim == 3:
             x = np.transpose(np.fliplr(np.transpose(x, (0, 2, 1))), (0, 2, 1))
@@ -332,8 +332,6 @@ def flip(x):
         # x = x.swapaxes(0, dim)
 
         x = torch.from_numpy(x.copy())
-        if is_cuda:
-            x = x.cuda()
         return x
 
 

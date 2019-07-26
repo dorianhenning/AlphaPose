@@ -22,9 +22,6 @@ def get_test_input(input_dim, CUDA):
     img_ = torch.from_numpy(img_).float()
     img_ = Variable(img_)
     
-    if CUDA:
-        img_ = img_.cuda()
-    
     return img_
 
 def prep_image(img, inp_dim):
@@ -87,11 +84,11 @@ if __name__ == '__main__':
     nms_thesh = float(args.nms_thresh)
     start = 0
 
-    CUDA = torch.cuda.is_available()
+    CUDA = False
 
         
 
-    CUDA = torch.cuda.is_available()
+    CUDA = False
     num_classes = 80 
     bbox_attrs = 5 + num_classes
     
@@ -105,10 +102,6 @@ if __name__ == '__main__':
     assert inp_dim % 32 == 0 
     assert inp_dim > 32
 
-    
-    if CUDA:
-        model.cuda().half()
-        
     model(get_test_input(inp_dim, CUDA), CUDA)
 
     model.eval()
@@ -131,18 +124,9 @@ if __name__ == '__main__':
             
             im_dim = torch.FloatTensor(dim).repeat(1,2)                        
             
-            
-            if CUDA:
-                img = img.cuda().half()
-                im_dim = im_dim.half().cuda()
-                write_results = write_results_half
-                predict_transform = predict_transform_half
-            
-            
             output = model(Variable(img, volatile = True), CUDA)
             output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
 
-           
             if type(output) == int:
                 frames += 1
                 print("FPS of the video is {:5.2f}".format( frames / (time.time() - start)))
@@ -152,7 +136,6 @@ if __name__ == '__main__':
                     break
                 continue
 
-        
             im_dim = im_dim.repeat(output.size(0), 1)
             scaling_factor = torch.min(inp_dim/im_dim,1)[0].view(-1,1)
             

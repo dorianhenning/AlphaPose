@@ -56,7 +56,6 @@ if __name__ == "__main__":
         pose_model = InferenNet_fast(4 * 1 + 1, pose_dataset)
     else:
         pose_model = InferenNet(4 * 1 + 1, pose_dataset)
-    pose_model.cuda()
     pose_model.eval()
 
     runtime_profile = {
@@ -91,7 +90,7 @@ if __name__ == "__main__":
             num_batches = datalen // batchSize + leftover
             hm = []
             for j in range(num_batches):
-                inps_j = inps[j*batchSize:min((j +  1)*batchSize, datalen)].cuda()
+                inps_j = inps[j*batchSize:min((j +  1)*batchSize, datalen)]
                 hm_j = pose_model(inps_j)
                 hm.append(hm_j)
             hm = torch.cat(hm)
@@ -113,8 +112,9 @@ if __name__ == "__main__":
     print('===========================> Finish Model Running.')
     if (args.save_img or args.save_video) and not args.vis_fast:
         print('===========================> Rendering remaining images in the queue...')
-        print('===========================> If this step takes too long, you can enable the --vis_fast flag to use fast rendering (real-time).')
-    while(writer.running()):
+        print('===========================> If this step takes too long, you can enable '
+              'the --vis_fast flag to use fast rendering (real-time).')
+    while writer.running():
         pass
     writer.stop()
     final_result = writer.results()
